@@ -2,9 +2,7 @@ package com.cts.training.zoo.api.cryptozoologyzooapi.entity;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Animal {
@@ -16,6 +14,8 @@ public class Animal {
 
     private String type;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    private Habitat habitat;
 
     private String mood = "unhappy";
 
@@ -26,6 +26,14 @@ public class Animal {
     public Animal(String name, String type) {
         this.name = name;
         this.type = type;
+    }
+
+    public Habitat getHabitat() {
+        return habitat;
+    }
+
+    public void setHabitat(Habitat habitat) {
+        this.habitat = habitat;
     }
 
     public Integer getId() {

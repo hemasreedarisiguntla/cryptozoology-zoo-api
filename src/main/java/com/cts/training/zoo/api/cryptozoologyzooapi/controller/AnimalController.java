@@ -31,4 +31,9 @@ public class AnimalController {
     public Animal updateAnimalMood(@PathVariable Integer id) {
         return animalService.updateAnimalMood(id);
     }
+
+    @PutMapping("/{animalId}/habitats/{habitatName}")
+    public Animal updateAnimalHabitat(@PathVariable Integer animalId, @PathVariable String habitatName) {
+        return animalService.updateAnimalHabitat(animalId, habitatName);
+    }
 }

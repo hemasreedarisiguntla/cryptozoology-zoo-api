@@ -1,15 +1,19 @@
 package com.cts.training.zoo.api.cryptozoologyzooapi;
 
 import com.cts.training.zoo.api.cryptozoologyzooapi.entity.Animal;
+import com.cts.training.zoo.api.cryptozoologyzooapi.entity.Habitat;
 import com.cts.training.zoo.api.cryptozoologyzooapi.service.AnimalService;
+import com.cts.training.zoo.api.cryptozoologyzooapi.service.HabitatService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
@@ -24,6 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@AutoConfigureTestDatabase
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CryptozoologyZooApiApplicationTest {
 
     @Autowired
@@ -34,6 +40,9 @@ class CryptozoologyZooApiApplicationTest {
 
     @Autowired
     AnimalService animalService;
+
+    @Autowired
+    HabitatService habitatService;
 
     @Test
     void contextLoads() {
@@ -139,5 +148,51 @@ class CryptozoologyZooApiApplicationTest {
                 .andExpect(jsonPath("$.type").value(animal1.getType()))
                 .andExpect(jsonPath("$.mood").value("happy"));
     }
+
+    /**
+     * As a zookeeper, I want to maintain different types of habitats so that I can put different types of animals in them.
+     * <p>
+     * Given I have an empty <habitat>
+     * When I put animal of <type> into a compatible habitat
+     * Then the animal is in the habitat
+     * <p>
+     * Given I have an empty <habitat>
+     * When I put animal of <type> into an incompatible habitat
+     * Then the animal habitat should not change
+     * And the animal becomes unhappy
+     * <p>
+     * Given I have an occuppied habitat
+     * When I put an animal into the occupied habitat
+     * Then the animal habitat should not change
+     * <p>
+     * |   type  |  habitat  |
+     * | --------- | --------- |
+     * | flying     |   nest    |
+     * | swimming  |   ocean   |
+     * | walking   |   forest  |
+     */
+
+    @Test
+    public void testUpdateHabitatWithEmptyHabitat() throws Exception {
+
+        Animal animal = new Animal("goldenfish", "swimming");
+        Animal animal1 = animalService.addAnimal(animal);
+
+        Habitat habitat = new Habitat("swimming", "ocean");
+        Habitat habitat1 = habitatService.addHabitat(habitat);
+
+        mockMvc.perform(
+                put("/api/zoo/animals/{animalId}/habitats/{habitatName}", animal1.getId(), habitat.getName())
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value(animal1.getName()))
+                .andExpect(jsonPath("$.type").value(animal1.getType()))
+                .andExpect(jsonPath("$.habitat.name").value(animal1.getHabitat().getName()));
+        //.andExpect(jsonPath("$.mood").value("happy"));
+
+    }
+
 
 }
