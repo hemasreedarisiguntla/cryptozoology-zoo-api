@@ -26,4 +26,9 @@ public class AnimalController {
     public List<Animal> getAllAnimals() {
         return animalService.getAllAnimals();
     }
+
+    @PutMapping("/{id}")
+    public Animal updateAnimalMood(@PathVariable Integer id) {
+        return animalService.updateAnimalMood(id);
+    }
 }

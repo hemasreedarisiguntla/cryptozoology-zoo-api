@@ -16,8 +16,7 @@ import javax.transaction.Transactional;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -87,6 +86,58 @@ class CryptozoologyZooApiApplicationTest {
                 .andExpect(jsonPath("$[0].name").value(animal1.getName()))
                 .andExpect(jsonPath("$[0].type").value(animal1.getType()));
 
+    }
+
+    /**
+     * As a zookeper, I want to feed my animals.
+     * <p>
+     * Rule: Animal moods are unhappy or happy. They are unhappy by default.
+     * <p>
+     * Given an animal is unhappy
+     * When I give it a treat
+     * Then the animal is happy
+     */
+
+    @Test
+    void testUpdateAnimalMoodWithDefaultMood() throws Exception {
+        Animal animal1 = animalService.addAnimal(new Animal("goldenfish", "swimming"));
+
+        mockMvc.perform(
+                put("/api/zoo/animals/{id}", animal1.getId())
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value(animal1.getName()))
+                .andExpect(jsonPath("$.type").value(animal1.getType()))
+                .andExpect(jsonPath("$.mood").value("happy"));
+    }
+
+    /**
+     * As a zookeper, I want to feed my animals.
+     * <p>
+     * Rule: Animal moods are unhappy or happy. They are unhappy by default.
+     * Given an animal is happy
+     * When I give it a treat
+     * Then the animal is still happy
+     *
+     * @throws Exception
+     */
+    @Test
+    void testUpdateAnimalMoodWithHappyMood() throws Exception {
+        Animal animal = new Animal("goldenfish", "swimming");
+        animal.setMood("happy");
+        Animal animal1 = animalService.addAnimal(animal);
+
+        mockMvc.perform(
+                put("/api/zoo/animals/{id}", animal1.getId())
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value(animal1.getName()))
+                .andExpect(jsonPath("$.type").value(animal1.getType()))
+                .andExpect(jsonPath("$.mood").value("happy"));
     }
 
 }

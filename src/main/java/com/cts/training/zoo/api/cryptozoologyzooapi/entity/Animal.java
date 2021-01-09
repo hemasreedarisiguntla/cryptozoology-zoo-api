@@ -16,6 +16,9 @@ public class Animal {
 
     private String type;
 
+
+    private String mood = "unhappy";
+
     public Animal() {
 
     }
@@ -43,5 +46,13 @@ public class Animal {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getMood() {
+        return mood;
+    }
+
+    public void setMood(String mood) {
+        this.mood = mood;
     }
 }

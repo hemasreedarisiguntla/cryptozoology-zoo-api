@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class AnimalService {
@@ -19,5 +21,20 @@ public class AnimalService {
 
     public List<Animal> getAllAnimals() {
         return animalRepository.findAll();
+    }
+
+    public Animal updateAnimalMood(Integer id) {
+        Animal animal;
+        try {
+            animal = animalRepository.findById(id).get();
+            if (animal.getMood().equals("unhappy")) {
+                animal.setMood("happy");
+                animalRepository.save(animal);
+            }
+
+        } catch (NoSuchElementException e) {
+            animal = null;
+        }
+        return animal;
     }
 }
