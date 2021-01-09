@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class CryptozoologyZooApiApplicationTests {
+class CryptozoologyZooApiApplicationTest {
 
 	@Autowired
 	MockMvc mockMvc;
@@ -30,16 +30,25 @@ class CryptozoologyZooApiApplicationTests {
 	void contextLoads() {
 	}
 
+	/**
+	 * Rule: Animal should have a name and a type (flying, swimming, walking)
+	 *
+	 * When I add an animalDto
+	 * Then it is in my zoo
+	 * @throws Exception
+	 */
 	@Test
-	void addAnimals() throws Exception {
+	void testAddAnimal() throws Exception {
 		Animal animal = new Animal("Lion","walking");
 		mockMvc.perform(
 				post("/api/zoo/animals")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(mapper.writeValueAsString(animal))
 		).andExpect(status().isCreated())
-		.andExpect(jsonPath("$.id").exists());
-
+				.andExpect(jsonPath("$.id").exists())
+				.andExpect(jsonPath("$.id").value(1))
+				.andExpect(jsonPath("$.name").value(animal.getName()))
+				.andExpect(jsonPath("$.type").value(animal.getType()));
 	}
 
 }
