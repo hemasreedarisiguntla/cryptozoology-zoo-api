@@ -16,6 +16,10 @@ public class Animal {
 
     private String type;
 
+    public Animal() {
+
+    }
+
     public Animal(String name, String type) {
         this.name = name;
         this.type = type;
