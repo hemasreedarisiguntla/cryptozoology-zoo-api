@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * CRUD service class for {@link Animal} {@link javax.persistence.Entity}
+ */
 @Service
 public class AnimalService {
 
