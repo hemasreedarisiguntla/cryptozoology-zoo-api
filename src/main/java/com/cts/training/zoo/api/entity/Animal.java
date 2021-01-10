@@ -1,6 +1,4 @@
-package com.cts.training.zoo.api.cryptozoologyzooapi.entity;
-
-import lombok.Data;
+package com.cts.training.zoo.api.entity;
 
 import javax.persistence.*;
 

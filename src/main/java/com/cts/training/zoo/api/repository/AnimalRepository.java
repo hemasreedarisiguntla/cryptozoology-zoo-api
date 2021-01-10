@@ -1,6 +1,6 @@
-package com.cts.training.zoo.api.cryptozoologyzooapi.repository;
+package com.cts.training.zoo.api.repository;
 
-import com.cts.training.zoo.api.cryptozoologyzooapi.entity.Animal;
+import com.cts.training.zoo.api.entity.Animal;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

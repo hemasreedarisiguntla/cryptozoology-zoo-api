@@ -1,13 +1,16 @@
-package com.cts.training.zoo.api.cryptozoologyzooapi.controller;
+package com.cts.training.zoo.api.controller;
 
-import com.cts.training.zoo.api.cryptozoologyzooapi.entity.Animal;
-import com.cts.training.zoo.api.cryptozoologyzooapi.service.AnimalService;
+import com.cts.training.zoo.api.entity.Animal;
+import com.cts.training.zoo.api.service.AnimalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ *Animal API handler methods.
+ */
 @RestController
 @RequestMapping("/api/zoo/animals")
 public class AnimalController {
@@ -24,11 +27,13 @@ public class AnimalController {
 
     @GetMapping
     public List<Animal> getAllAnimals() {
+
         return animalService.getAllAnimals();
     }
 
     @PutMapping("/{id}")
     public Animal updateAnimalMood(@PathVariable Integer id) {
+
         return animalService.updateAnimalMood(id);
     }
 

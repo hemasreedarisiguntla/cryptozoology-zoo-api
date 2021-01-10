@@ -1,7 +1,7 @@
-package com.cts.training.zoo.api.cryptozoologyzooapi.service;
+package com.cts.training.zoo.api.service;
 
-import com.cts.training.zoo.api.cryptozoologyzooapi.entity.Habitat;
-import com.cts.training.zoo.api.cryptozoologyzooapi.repository.HabitatRepository;
+import com.cts.training.zoo.api.entity.Habitat;
+import com.cts.training.zoo.api.repository.HabitatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
