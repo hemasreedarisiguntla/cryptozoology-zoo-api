@@ -4,6 +4,7 @@ import com.cts.training.zoo.api.entity.Animal;
 import com.cts.training.zoo.api.entity.Habitat;
 import com.cts.training.zoo.api.repository.AnimalRepository;
 import com.cts.training.zoo.api.repository.HabitatRepository;
+import com.cts.training.zoo.api.service.enums.AnimalMoodEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,8 +54,8 @@ public class AnimalService {
         Animal animal;
         try {
             animal = animalRepository.findById(id).get();
-            if (animal.getMood().equals("unhappy")) {
-                animal.setMood("happy");
+            if (animal.getMood().equalsIgnoreCase(AnimalMoodEnum.UNHAPPY.name())) {
+                animal.setMood(AnimalMoodEnum.HAPPY.name());
                 animalRepository.save(animal);
             }
 
@@ -79,7 +80,7 @@ public class AnimalService {
             Habitat habitat = habitatRepository.findByName(habitatName);
             if (habitat != null) {
                 if (!habitat.getType().equalsIgnoreCase(animal.getType())) {
-                    animal.setMood("unhappy");
+                    animal.setMood(AnimalMoodEnum.UNHAPPY.name());
                 } else {
                     if( habitat.getOccupiedCount() < habitat.getMaxOccupationAllowed()) {
                         habitat.setOccupiedCount(habitat.getOccupiedCount() + 1);
@@ -102,7 +103,6 @@ public class AnimalService {
      * @return matched animals.
      */
     public List<Animal> findAllAnimals(String mood, String type) {
-        System.out.println(animalRepository.findAll());
         return animalRepository.findByMoodAndType(mood, type);
     }
 }

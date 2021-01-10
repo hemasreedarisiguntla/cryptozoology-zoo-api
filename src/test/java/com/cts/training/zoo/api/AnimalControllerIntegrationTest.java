@@ -4,6 +4,8 @@ import com.cts.training.zoo.api.entity.Animal;
 import com.cts.training.zoo.api.entity.Habitat;
 import com.cts.training.zoo.api.service.AnimalService;
 import com.cts.training.zoo.api.service.HabitatService;
+import com.cts.training.zoo.api.service.enums.AnimalMoodEnum;
+import com.cts.training.zoo.api.service.enums.HabitatEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,9 +59,9 @@ class AnimalControllerIntegrationTest {
     @BeforeEach
     public void setUp() {
         habitatList = new LinkedList<>();
-        habitatList.add(habitatService.addHabitat(new Habitat(1, "swimming", "ocean", 300)));
-        habitatList.add(habitatService.addHabitat(new Habitat(2, "flying", "nest", 500)));
-        habitatList.add(habitatService.addHabitat(new Habitat(3, "walking", "forest", 2)));
+        habitatList.add(habitatService.addHabitat(new Habitat(1, HabitatEnum.SWIMMING.getType(), HabitatEnum.SWIMMING.getName(), 300)));
+        habitatList.add(habitatService.addHabitat(new Habitat(2, HabitatEnum.FLYING.getType(), HabitatEnum.FLYING.getName(), 500)));
+        habitatList.add(habitatService.addHabitat(new Habitat(3, HabitatEnum.WALKING.getType(), HabitatEnum.WALKING.getName(), 2)));
     }
 
     /**
@@ -96,9 +98,9 @@ class AnimalControllerIntegrationTest {
     @Test
     public void testGetAllAnimals() throws Exception {
 
-        Animal animal1 = animalService.addAnimal(new Animal("goldenfish", "swimming"));
-        Animal animal2 = animalService.addAnimal(new Animal("crow", "flying"));
-        Animal animal3 = animalService.addAnimal(new Animal("lion", "walking"));
+        Animal animal1 = animalService.addAnimal(new Animal("goldenfish", HabitatEnum.SWIMMING.getType()));
+        Animal animal2 = animalService.addAnimal(new Animal("crow", HabitatEnum.FLYING.getType()));
+        Animal animal3 = animalService.addAnimal(new Animal("lion", HabitatEnum.WALKING.getType()));
 
         mockMvc.perform(
                 get("/api/zoo/animals")
@@ -133,7 +135,7 @@ class AnimalControllerIntegrationTest {
     @DisplayName("updateAnimalMood - WithDefaultMood")
     @Test
     void testUpdateAnimalMoodWithDefaultMood() throws Exception {
-        Animal animal1 = animalService.addAnimal(new Animal("goldenfish", "swimming"));
+        Animal animal1 = animalService.addAnimal(new Animal("goldenfish", HabitatEnum.SWIMMING.getType()));
 
         mockMvc.perform(
                 put("/api/zoo/animals/{id}", animal1.getId())
@@ -142,7 +144,7 @@ class AnimalControllerIntegrationTest {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value(animal1.getName()))
                 .andExpect(jsonPath("$.type").value(animal1.getType()))
-                .andExpect(jsonPath("$.mood").value("happy"));
+                .andExpect(jsonPath("$.mood").value(AnimalMoodEnum.HAPPY.name()));
     }
 
     /**
@@ -158,8 +160,8 @@ class AnimalControllerIntegrationTest {
     @DisplayName("updateAnimalMood - WithHappyMood")
     @Test
     void testUpdateAnimalMoodWithHappyMood() throws Exception {
-        Animal animal = new Animal("goldenfish", "swimming");
-        animal.setMood("happy");
+        Animal animal = new Animal("goldenfish", HabitatEnum.SWIMMING.getType());
+        animal.setMood(AnimalMoodEnum.HAPPY.name());
         Animal animal1 = animalService.addAnimal(animal);
 
         mockMvc.perform(
@@ -169,7 +171,7 @@ class AnimalControllerIntegrationTest {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.name").value(animal1.getName()))
                 .andExpect(jsonPath("$.type").value(animal1.getType()))
-                .andExpect(jsonPath("$.mood").value("happy"));
+                .andExpect(jsonPath("$.mood").value(AnimalMoodEnum.HAPPY.name()));
     }
 
     /**
@@ -189,7 +191,7 @@ class AnimalControllerIntegrationTest {
     @Test
     public void testUpdateAnimalHabitatWithEmptyHabitat() throws Exception {
 
-        Animal goldenFish = animalService.addAnimal(new Animal("goldenfish", "swimming"));
+        Animal goldenFish = animalService.addAnimal(new Animal("goldenfish", HabitatEnum.SWIMMING.getType()));
         Habitat oceanHabitat = habitatList.get(0);
 
         mockMvc.perform(
@@ -197,7 +199,7 @@ class AnimalControllerIntegrationTest {
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(goldenFish.getId()))
                 .andExpect(jsonPath("$.name").value(goldenFish.getName()))
                 .andExpect(jsonPath("$.type").value(goldenFish.getType()))
                 .andExpect(jsonPath("$.habitat.name").value(goldenFish.getHabitat().getName()))
@@ -218,20 +220,20 @@ class AnimalControllerIntegrationTest {
     @Test
     public void testUpdateAnimalHabitatWithIncompatibleHabitat() throws Exception {
 
-        Animal goldenFish = new Animal("goldenfish", "swimming");
-        goldenFish.setMood("happy");
+        Animal goldenFish = new Animal("goldenfish", HabitatEnum.SWIMMING.getType());
+        goldenFish.setMood(AnimalMoodEnum.HAPPY.name());
         goldenFish.setHabitat(habitatList.get(0));
         Animal addedGoldenFish = animalService.addAnimal(goldenFish);
 
         mockMvc.perform(
-                put("/api/zoo/animals/{animalId}/habitats/{habitatName}", addedGoldenFish.getId(), "nest")
+                put("/api/zoo/animals/{animalId}/habitats/{habitatName}", addedGoldenFish.getId(), HabitatEnum.FLYING.getName())
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.id").value(addedGoldenFish.getId()))
                 .andExpect(jsonPath("$.name").value(addedGoldenFish.getName()))
                 .andExpect(jsonPath("$.type").value(addedGoldenFish.getType()))
-                .andExpect(jsonPath("$.mood").value("unhappy"))
+                .andExpect(jsonPath("$.mood").value(AnimalMoodEnum.UNHAPPY.name()))
                 .andExpect(jsonPath("$.habitat.name").value(addedGoldenFish.getHabitat().getName()));
 
     }
@@ -250,21 +252,21 @@ class AnimalControllerIntegrationTest {
     @Test
     public void testUpdateAnimalHabitatWithOccupiedHabitat() throws Exception {
         Habitat forestHabitat = habitatList.get(2);
-        Animal lion = new Animal("lion", "walking");
+        Animal lion = new Animal("lion", HabitatEnum.WALKING.getType());
         forestHabitat.setOccupiedCount(1);
         lion.setHabitat(forestHabitat);
         animalService.addAnimal(lion);
 
-        Animal tiger = new Animal("tiger", "walking");
+        Animal tiger = new Animal("tiger", HabitatEnum.WALKING.getType());
         forestHabitat.setOccupiedCount(2);
         tiger.setHabitat(forestHabitat);
         animalService.addAnimal(tiger);
 
-        Animal bear = new Animal("bear", "walking");
+        Animal bear = new Animal("bear", HabitatEnum.WALKING.getType());
         Animal bearWithoutHabitat = animalService.addAnimal(bear);
 
         mockMvc.perform(
-                put("/api/zoo/animals/{animalId}/habitats/{habitatName}", bearWithoutHabitat.getId(), "forest")
+                put("/api/zoo/animals/{animalId}/habitats/{habitatName}", bearWithoutHabitat.getId(), HabitatEnum.WALKING.getName())
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").exists())
@@ -288,7 +290,7 @@ class AnimalControllerIntegrationTest {
     public void testFindAnimalsReturnValidList() throws Exception {
         addFewAnimalsForSearch();
         mockMvc.perform(
-                get("/api/zoo/animals/mood/{mood}/type/{type}", "happy", "walking")
+                get("/api/zoo/animals/mood/{mood}/type/{type}", AnimalMoodEnum.HAPPY.name(), HabitatEnum.WALKING.getType())
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)));
@@ -310,7 +312,7 @@ class AnimalControllerIntegrationTest {
     public void testFindAnimalsReturnEmptyList() throws Exception {
         addFewAnimalsForSearch();
         mockMvc.perform(
-                get("/api/zoo/animals/mood/{mood}/type/{type}", "unhappy", "flying")
+                get("/api/zoo/animals/mood/{mood}/type/{type}", AnimalMoodEnum.UNHAPPY.name(), HabitatEnum.FLYING.getType())
         )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
@@ -324,34 +326,34 @@ class AnimalControllerIntegrationTest {
         Habitat oceanHabitat = habitatList.get(0);
         Habitat nestHabitat = habitatList.get(0);
 
-        Animal lion = new Animal("lion", "walking");
+        Animal lion = new Animal("lion", HabitatEnum.WALKING.getType());
         forestHabitat.setOccupiedCount(1);
-        lion.setMood("happy");
+        lion.setMood(AnimalMoodEnum.HAPPY.name());
         lion.setHabitat(forestHabitat);
         animalService.addAnimal(lion);
 
-        Animal tiger = new Animal("tiger", "walking");
+        Animal tiger = new Animal("tiger", HabitatEnum.WALKING.getType());
         forestHabitat.setOccupiedCount(2);
         tiger.setHabitat(forestHabitat);
-        tiger.setMood("happy");
+        tiger.setMood(AnimalMoodEnum.HAPPY.name());
         animalService.addAnimal(tiger);
 
-        Animal bear = new Animal("tiger", "walking");
+        Animal bear = new Animal("tiger", HabitatEnum.WALKING.getType());
         forestHabitat.setOccupiedCount(3);
         bear.setHabitat(forestHabitat);
-        bear.setMood("unhappy");
+        bear.setMood(AnimalMoodEnum.UNHAPPY.name());
         animalService.addAnimal(bear);
 
-        Animal goldenFish = new Animal("goldenFish", "swimming");
+        Animal goldenFish = new Animal("goldenFish", HabitatEnum.SWIMMING.getType());
         oceanHabitat.setOccupiedCount(1);
         goldenFish.setHabitat(oceanHabitat);
-        goldenFish.setMood("happy");
+        goldenFish.setMood(AnimalMoodEnum.HAPPY.name());
         animalService.addAnimal(goldenFish);
 
-        Animal peacock = new Animal("peacock", "flying");
+        Animal peacock = new Animal("peacock", HabitatEnum.FLYING.getType());
         nestHabitat.setOccupiedCount(1);
         peacock.setHabitat(nestHabitat);
-        peacock.setMood("happy");
+        peacock.setMood(AnimalMoodEnum.HAPPY.name());
         animalService.addAnimal(peacock);
     }
 }
