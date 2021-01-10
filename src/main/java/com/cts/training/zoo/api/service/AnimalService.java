@@ -90,4 +90,16 @@ public class AnimalService {
         }
         return animal;
     }
+
+    /**
+     * Finds all the animals in the zoo which are matched with mood and typ provided.
+     *
+     * @param mood
+     * @param type
+     * @return matched animals.
+     */
+    public List<Animal> findAllAnimals(String mood, String type) {
+        System.out.println(animalRepository.findAll());
+        return animalRepository.findByMoodAndType(mood, type);
+    }
 }

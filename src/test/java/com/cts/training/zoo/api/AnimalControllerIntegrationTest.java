@@ -273,4 +273,85 @@ class AnimalControllerIntegrationTest {
                 .andExpect(jsonPath("$.type").value(bearWithoutHabitat.getType()))
                 .andExpect(jsonPath("$.habitat").doesNotExist());
     }
+
+    /**
+     * As a zookeeper, I want to search zoo data so that I can make reports on my zoo.
+     * <p>
+     * Given I have animals in my zoo
+     * When I search for <mood> and <type>
+     * Then I see a list of animals matching only <mood> and <type>
+     *
+     * @throws Exception
+     */
+    @DisplayName("findAnimals - nonEmpty list")
+    @Test
+    public void testFindAnimalsReturnValidList() throws Exception {
+        addFewAnimalsForSearch();
+        mockMvc.perform(
+                get("/api/zoo/animals/mood/{mood}/type/{type}", "happy", "walking")
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+
+    /**
+     * As a zookeeper, I want to search zoo data so that I can make reports on my zoo.
+     * <p>
+     * Given I have habitats in my zoo
+     * When I search for empty habitats
+     * Then I see a list of empty habitats
+     * <p>
+     *
+     * @throws Exception
+     */
+    @DisplayName("findAnimals - empty list")
+    @Test
+    public void testFindAnimalsReturnEmptyList() throws Exception {
+        addFewAnimalsForSearch();
+        mockMvc.perform(
+                get("/api/zoo/animals/mood/{mood}/type/{type}", "unhappy", "flying")
+        )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    /**
+     * Add few animals as a data required for search.
+     */
+    private void addFewAnimalsForSearch() {
+        Habitat forestHabitat = habitatList.get(2);
+        Habitat oceanHabitat = habitatList.get(0);
+        Habitat nestHabitat = habitatList.get(0);
+
+        Animal lion = new Animal("lion", "walking");
+        forestHabitat.setOccupiedCount(1);
+        lion.setMood("happy");
+        lion.setHabitat(forestHabitat);
+        animalService.addAnimal(lion);
+
+        Animal tiger = new Animal("tiger", "walking");
+        forestHabitat.setOccupiedCount(2);
+        tiger.setHabitat(forestHabitat);
+        tiger.setMood("happy");
+        animalService.addAnimal(tiger);
+
+        Animal bear = new Animal("tiger", "walking");
+        forestHabitat.setOccupiedCount(3);
+        bear.setHabitat(forestHabitat);
+        bear.setMood("unhappy");
+        animalService.addAnimal(bear);
+
+        Animal goldenFish = new Animal("goldenFish", "swimming");
+        oceanHabitat.setOccupiedCount(1);
+        goldenFish.setHabitat(oceanHabitat);
+        goldenFish.setMood("happy");
+        animalService.addAnimal(goldenFish);
+
+        Animal peacock = new Animal("peacock", "flying");
+        nestHabitat.setOccupiedCount(1);
+        peacock.setHabitat(nestHabitat);
+        peacock.setMood("happy");
+        animalService.addAnimal(peacock);
+    }
 }
